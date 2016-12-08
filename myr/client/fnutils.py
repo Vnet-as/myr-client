@@ -7,6 +7,23 @@ myr.client.fnutils
 
 import inspect
 
+FUNCTION_SIGNATURE_FMT = '''\
+def {name}({arg_fmt}):
+    pass
+'''
+
+
+def function_from_signature(name, signature, fmt=FUNCTION_SIGNATURE_FMT):
+    namespace = {}
+    exec(
+        FUNCTION_SIGNATURE_FMT.format(
+            name=name,
+            arg_fmt=formatargspec(**signature)
+        ),
+        namespace,
+    )
+    return namespace[name]
+
 
 def formatargspec(**spec):
     # handle inspect.getargspec (ArgSpec format)
