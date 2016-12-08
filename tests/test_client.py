@@ -6,7 +6,7 @@ except ImportError:
     import mock
 
 from celery import Celery
-from myr.client import Client
+from myr.client import Client, RemoteProcedureCaller
 
 
 class TestClient:
@@ -80,3 +80,41 @@ class TestClient:
             client = Client()
             client.discover()
         assert len(client.task_registry) == 2
+
+
+class TestRemoteProcedureCaller:
+
+    def test_getattr(self):
+        class AsyncResult:
+            def get(self):
+                return {
+                    'remote.procedure': {
+                        'signature': {
+                            'args': ['a'], 'defaults': None,
+                            'varkw': None, 'varargs': None
+                        },
+                        'routing': {}
+                    },
+                    'remote.task': {
+                        'signature': {
+                            'args': ['a', 'b'], 'defaults': None,
+                            'varkw': None, 'varargs': None
+                        },
+                        'routing': {}
+                    }
+                }
+        with mock.patch.object(
+            Celery, 'send_task', return_value=AsyncResult()
+        ):
+            client = Client()
+            client.discover()
+        assert len(client.task_registry) == 2
+
+        remote = client.rpc.remote
+        assert isinstance(remote, RemoteProcedureCaller)
+        assert remote.client is client
+        assert callable(client.rpc.remote.procedure)
+        assert callable(remote.procedure)
+        with pytest.raises(AttributeError):
+            client.rpc.remote.nonexistent
+        client.rpc.remote.task
