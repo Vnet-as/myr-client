@@ -13,10 +13,10 @@ class TestArgsSignature:
     def _test_args_signature_str_from_spec(self, fn, sig, only_full=False):
         if not only_full:
             spec = inspect.getargspec(fn)
-            assert fnutils.formatargspec(spec._asdict()) == sig
+            assert fnutils.formatargspec(**spec._asdict()) == sig
         if IS_PY3:
             spec = inspect.getfullargspec(fn)
-            assert fnutils.formatargspec(spec._asdict()) == sig
+            assert fnutils.formatargspec(**spec._asdict()) == sig
 
     def test_simple(self):
         def fn(a):

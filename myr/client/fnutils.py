@@ -8,7 +8,7 @@ myr.client.fnutils
 import inspect
 
 
-def formatargspec(spec):
+def formatargspec(**spec):
     # handle inspect.getargspec (ArgSpec format)
     if 'keywords' in spec:
         spec['varkw'] = spec.pop('keywords')
