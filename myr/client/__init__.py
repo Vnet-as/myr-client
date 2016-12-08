@@ -44,8 +44,10 @@ class Client:
         self.task_registry = self._process_discover(async_discovered.get())
 
     def call_task(self, name, args=None, kwargs=None, **options):
+        task_def = self.task_registry[name]
         # validate given arguments
-        self.task_registry[name]['fn'](*args, **kwargs)
+        task_def['fn'](*args, **kwargs)
+        options.update(task_def.get('routing', {}))
         return self.app.send_task(name, args=args, kwargs=kwargs, **options)
 
     @property
