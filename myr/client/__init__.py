@@ -43,12 +43,15 @@ class Client:
         async_discovered = self._send_discover()
         self.task_registry = self._process_discover(async_discovered.get())
 
-    def call_task(self, name, args=None, kwargs=None, **options):
-        task_def = self.task_registry[name]
+    def call_task(
+        self, task_name, task_def,
+        args=None, kwargs=None, **options
+    ):
         # validate given arguments
         task_def['fn'](*args, **kwargs)
         options.update(task_def.get('routing', {}))
-        return self.app.send_task(name, args=args, kwargs=kwargs, **options)
+        return self.app.send_task(
+            task_name, args=args, kwargs=kwargs, **options)
 
     @property
     def rpc(self):
@@ -71,11 +74,13 @@ class RemoteProcedureCaller:
         # preprepared task call
         if full_name in self.client.task_registry:
             options = self.options.copy()
+            task_def = self.client.task_registry[full_name]
 
             # TODO: Copy __doc__ once it is available in the discovery
             def fn(*args, **kwargs):
                 return self.client.call_task(
-                    name, args=args, kwargs=kwargs, **options)
+                    full_name, task_def,
+                    args=args, kwargs=kwargs, **options)
 
             fn.__name__ = name
             return fn
