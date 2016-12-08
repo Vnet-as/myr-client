@@ -3,9 +3,28 @@
 import sys
 import inspect
 
+import pytest
+
 import myr.client.fnutils as fnutils
 
 IS_PY3 = sys.version_info[0] == 3
+
+
+class TestFunctionBuild:
+
+    def test_fn_creation(self):
+        signature = {
+            'args': ['a'],
+            'defaults': None,
+            'keywords': None,
+            'varargs': None
+        }
+        fn = fnutils.function_from_signature('fn', signature)
+        assert callable(fn)
+        fn(None)
+        with pytest.raises(TypeError):
+            fn(None, None)
+        assert dict(inspect.getargspec(fn)._asdict()) == signature
 
 
 class TestArgsSignature:
