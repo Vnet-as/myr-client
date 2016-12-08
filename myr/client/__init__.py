@@ -23,7 +23,7 @@ class Client:
         send_task_options=None
     ):
         self.app = app or current_app
-        self.send_task_options = send_task_options
+        self.send_task_options = send_task_options or {}
         self.task_registry = None
 
     def _send_discover(self, args=None, kwargs=None):
@@ -53,7 +53,7 @@ class Client:
     @property
     def rpc(self):
         return RemoteProcedureCaller(
-            client=self, base=(), options=self.send_task_options)
+            client=self, base=(), options=self.send_task_options.copy())
 
 
 class RemoteProcedureCaller:
@@ -70,11 +70,12 @@ class RemoteProcedureCaller:
         # If there is task with such a name return it's
         # preprepared task call
         if full_name in self.client.task_registry:
+            options = self.options.copy()
 
             # TODO: Copy __doc__ once it is available in the discovery
             def fn(*args, **kwargs):
                 return self.client.call_task(
-                    name, args=args, kwargs=kwargs, **self.options)
+                    name, args=args, kwargs=kwargs, **options)
 
             fn.__name__ = name
             return fn
