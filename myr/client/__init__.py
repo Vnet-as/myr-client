@@ -14,22 +14,25 @@ from myr.client import fnutils
 
 class Client:
 
-    DISCOVERY_DEFAULT_ARGS = ('myr.discovery.discover', )
-    DISCOVERY_DEFAULT_KWARGS = {}
+    DISCOVERY_ARGS = ('myr.discovery.discover', )
+    DISCOVERY_KWARGS = {'queue': '_myr_discovery_'}
 
     def __init__(
         self,
         app=None,
-        send_task_options=None
+        send_task_options=None,
+        discovery_args=None,
+        discovery_kwargs=None
     ):
         self.app = app or current_app
         self.send_task_options = send_task_options or {}
         self.task_registry = None
+        self.discovery_args = discovery_args or self.DISCOVERY_ARGS
+        self.discovery_kwargs = discovery_kwargs or self.DISCOVERY_KWARGS
 
-    def _send_discover(self, args=None, kwargs=None):
-        args = self.DISCOVERY_DEFAULT_ARGS if args is None else args
-        kwargs = self.DISCOVERY_DEFAULT_KWARGS if kwargs is None else kwargs
-        return self.app.send_task(*args, **kwargs)
+    def _send_discover(self):
+        return self.app.send_task(
+            *self.discovery_args, **self.discovery_kwargs)
 
     def _process_discover(self, discovered_tasks):
         registry = {}

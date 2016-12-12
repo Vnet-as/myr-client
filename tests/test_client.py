@@ -22,11 +22,16 @@ class TestClient:
             client = Client()
             client._send_discover()
             mock_method.assert_called_with(
-                *client.DISCOVERY_DEFAULT_ARGS,
-                **client.DISCOVERY_DEFAULT_KWARGS)
-            client._send_discover(args=())
+                *client.DISCOVERY_ARGS,
+                **client.DISCOVERY_KWARGS)
+            client.discovery_args = ()
+            client.discovery_kwargs = {}
+            client._send_discover()
             mock_method.assert_called_with()
-            client._send_discover(args=(), kwargs={'u': 2})
+
+            client.discovery_args = ()
+            client.discovery_kwargs = {'u': 2}
+            client._send_discover()
             mock_method.assert_called_with(**{'u': 2})
 
     def test__process_discover(self):
