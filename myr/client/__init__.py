@@ -10,12 +10,13 @@ Client module for ``myr-stack``
 from celery import current_app
 
 from myr.client import fnutils
+from myr.common import defaults as myr_defaults
 
 
 class Client:
 
     DISCOVERY_ARGS = ('myr.discovery.discover', )
-    DISCOVERY_KWARGS = {'queue': '_myr_discovery_'}
+    DISCOVERY_KWARGS = {'queue': myr_defaults.discovery_queue}
 
     def __init__(
         self,
