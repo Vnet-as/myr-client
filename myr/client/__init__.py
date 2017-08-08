@@ -8,6 +8,7 @@ Client module for ``myr-stack``
 '''
 
 from celery import current_app
+from celery.result import allow_join_result
 
 from myr.client import fnutils
 from myr.common import defaults as myr_defaults
@@ -45,7 +46,8 @@ class Client:
 
     def discover(self):
         async_discovered = self._send_discover()
-        self.task_registry = self._process_discover(async_discovered.get())
+        with allow_join_result():
+            self.task_registry = self._process_discover(async_discovered.get())
 
     def call_task(
         self, task_name, task_def,
