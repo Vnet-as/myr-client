@@ -1,2 +1,2 @@
-celery==5.2.3
+celery==5.2.6
 -e git+https://github.com/Vnet-as/myr-common.git#egg=myr.common
